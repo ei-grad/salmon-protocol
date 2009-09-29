@@ -43,4 +43,6 @@ The source responds to the salmon with standard HTTP codes - 2xx for OK, 4xx for
 
 The end result of the protocol is that sources and aggregators can co-operate to present a unified view of the global conversation around any topic represented by an RSS/Atom feed item.
 
-More details can be found on individual pages.  Eventually these will be collected into a proper RFC (or perhaps more than one).  RepublishingDetails talks about how sources can republish salmon back out to the world, merging comments from all sources.  SignatureDetails talks about how to generate and validate the sal:signature block above.  SalmonPublicKeys talks about the PKI that Salmon invents (not kidding).  
+More details can be found on individual pages.  Eventually these will be collected into a proper RFC (or perhaps more than one).  RepublishingDetails talks about how sources can republish salmon back out to the world, merging comments from all sources.  SignatureDetails talks about how to generate and validate the sal:signature block above.  SalmonPublicKeys talks about the PKI that Salmon invents (not kidding).
+
+TBD: Document the delegated signing flow, which is a good bit and has OAuth in it; describe how the protocol supports spam and abuse mitigation strategies; talk about the user experience and making sure that users are okay with their comments being republished.
