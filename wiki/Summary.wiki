@@ -12,9 +12,9 @@ A _source_ provides an RSS/Atom feed of content.  It includes a Salmon link in i
 
 {{{<link rel="salmon" href="http://example.org/salmon-endpoint"/>}}}
 
-An _aggregator_ reads the feed, or preferably receives an update via PubSubHubbub, and sees that the feed is Salmon-enabled.  It stores the endpoint for later use.
+An _aggregator_ reads the feed, preferably via PubSubHubbub, and sees from the link that it is Salmon-enabled.  It remembers the endpoint URL for later use.
 
-When an aggregator user comments on an item from that feed, the aggregator stores the comment as usual, and then also POSTs a version of it to the source feed's Salmon endpoint:
+When an aggregator user comments on an item from that feed, the aggregator stores the comment as usual, and then also POSTs a salmon version of it to the source's Salmon endpoint:
 
 {{{
 POST /salmon-endpoint HTTP/1.1
@@ -39,5 +39,30 @@ Content-Type: application/atom+xml
 </entry>
 }}}
 
-The source responds with standard HTTP codes - 2xx for OK, 4xx for input problem, 5xx for source / server error.
+The source responds to the salmon with standard HTTP codes - 2xx for OK, 4xx for input problem, 5xx for source / server error.  The usual result on a 2xx response is for the salmon to be published along with other comments on the source's web page.  Note that sources are not obligated to actually publish the salmon -- they may moderate them, spam block them, aggregate or analyze them instead.  However, if the source does publish the salmon in a comment feed, it has certain obligations detailed in the next section.
+
+= Details: Publishing the Comments Upstream =
+
+When a source re-publishes a salmon, it SHOULD check the salmon signature (sal:signature in the example above) against the content before publishing.  If the signature check fails, it SHOULD not publish the content publicly alongside valid comments.  It MUST maintain and re-publish the original octets for the following elements:  
+  * Contents of atom:author/uri element (a URI)
+  * Contents of atom:id element (a URI)
+  * Contents of atom:updated element (a timestamp)
+  * The thr:in-reply-to@ref attribute's content (a URI)
+  * The link@rel="self" @href attribute's content (a URI)
+  * Contents of sal:signature element (a base64 encoded text string)
+
+This allows readers to perform their own verification of these parts of the content, independent of the source.  The source is free to transform, translate, summarize, or elide other parts of the salmon in republishing, but the result SHOULD be a reasonable alternate representation of the original content.  Note that this can be checked after the fact by the aggregator, or anyone else.
+
+If the source publishes comments for entries in its feed, it SHOULD use the standard rel="comments" link to point at the comment feed from the root entry.  Aggregators may then subscribe to the comment feed using normal subscription mechanisms.  When they do so, they will see both source-originated comments and foreign salmon re-published.  Aggregators SHOULD remove duplicates from their view of the comments by matching atom:id against comments it already knows about. 
+
+Note that this means that an aggregator will likely see each salmon it pushes upstream come back in republished form almost immediately, especially if using a push notification service such as PubSubHubbub.  This is a feature; aggregators MAY use this to verify that a source is re-publishing salmon in a reasonable way.  Note also that an aggregator may see salmon from other aggregators in the feed.  Aggregators may wish to display the full contents of the comment feed, or they may wish to filter or summarize.
+
+== Details: Signatures ==
+
+The Salmon signature is a REQUIRED part of the protocol.  A salmon without a valid signature that matches the canonical elements is invalid and SHOULD be rejected outright.  This is a key building block to preventing spam and abuse.  Only a tightly constrained set of fields is signed in order to promote interoperability -- canonicalizing XML is a hard problem and we need minimum complexity.  The signed fields (author uri, id, updated, in-reply-to, self link) are carefully selected to promote interop while still ensuring that critical bits of the message can be trusted.  All of the fields use 7 bit ASCII encoding, are not localized, are small, and have very tightly defined syntax.  These fields record who, when, and what (the salmon id and the in-reply-to id) the salmon is about.
+
+The textual content itself, if any, is not signed, and may indeed be transformed in various ways by the source before republishing.  Thus a salmon signature does not guarantee message integrity.  It does however guarantee message provenance.  Assuming all data is published publicly, it is possible to follow links, look up ids, and check signatures, and see who if anyone is publishing a 'bad' version of the content.
+
+The signature 
+
 
