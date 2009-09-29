@@ -1,0 +1,43 @@
+#summary Summarizes the Salmon Protocol, the problem it solves, and its scope.
+
+= Introduction: Unifying the Conversations =
+
+Conversations are becoming distributed and fragmented on the Web.  Content is increasingly syndicated and re-aggregated across the Web beyond the context of its home web page.  Technologies such as RSS, Atom, and PubSubHubbub allow for a real time flow of updates to readers, but this leads to a fragmentation of conversations around the content.  The comments, ratings, and annotations increasingly happen at the aggregator and are invisible to the original source.
+
+The Salmon protocol is an open, simple, standards-based solution that lets aggregators and sources unify the conversations.  It focuses on public conversations around public content.
+
+= Details: Basic Protocol Flow =
+
+A _source_ provides an RSS/Atom feed of content.  It includes a Salmon link in its feed:
+
+{{{<link rel="salmon" href="http://example.org/salmon-endpoint"/>}}}
+
+An _aggregator_ reads the feed, or preferably receives an update via PubSubHubbub, and sees that the feed is Salmon-enabled.  It stores the endpoint for later use.
+
+When an aggregator user comments on an item from that feed, the aggregator stores the comment as usual, and then also POSTs a version of it to the source feed's Salmon endpoint:
+
+{{{
+POST /salmon-endpoint HTTP/1.1
+Host: example.org
+Content-Type: application/atom+xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+    <entry xmlns='http://www.w3.org/2005/Atom'>
+    <author>
+      <name>John Doe</name>
+      <uri>acct:johndoe@aggregator-example.com</uri>
+    </author>
+    <content>Yes, but what about the llamas?</content>
+    <id>tag:aggregator-example.com,2009:cmt-441071406174557701</id>
+    <updated>2009-09-28T18:30:02Z</updated>
+    <thr:in-reply-to xmlns:thr='http://purl.org/syndication/thread/1.0'
+       ref='tag:example.org,1999:id-22717401685551851865'/>
+    <sal:signature xmlns:sal='http://salmonprotocol.org/ns/1.0'>
+        e55bee08b4c643bc8aedf122f606f804269b7bc7
+    </sal:signature>
+    <title/>
+</entry>
+}}}
+
+The source responds with standard HTTP codes - 2xx for OK, 4xx for input problem, 5xx for source / server error.
+
