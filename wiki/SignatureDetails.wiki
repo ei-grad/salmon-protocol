@@ -28,20 +28,22 @@ The Salmon signature lets anyone verify who created a salmon when, and provides 
 
 === The Signature Algorithm ===
 
-Determining the signature:
+Creating the signature:
 
   # Take each of the values above and form a Signature Base String as in OAuth (see http://oauth.net/core/1.0, section 9), using simple string names (id, in-reply-to, self, updated, uri) as field names.
   # Sign as in OAuth (RSA-SHA1, or public key  - see OAuth section 9.3).  
   # The salmon signature string is the base64 representation of the output of the RSA-SHA1 algorithm (TODO: OK, so this really needs to be generalized, somebody with security expertise needs to hammer on this.)
-
-Signing:
-
-  # Calculate the signature as above.
-  # Add a sal:signature element underneath the atom:entry which contains the salmon signature string:  {{{<sal:signature>base64( RSASSA-PKCS1-V1_5-SIGN (private_key,"id=xxyy&updated=kkee&uri=foo"") )</salmon:signature>}}}.  Leading and trailing whitespace may be used for formatting.
+  # Add a sal:signature element underneath the atom:entry which contains the salmon signature string:  {{{<sal:signature>base64( RSASSA-PKCS1-V1_5-SIGN (private_key,"id=xxyy&updated=kkee&uri=foo"") )</salmon:signature>}}}.  Leading and trailing whitespace may be used for formatting.  
 
 Validation:
 
-  # Calculate the signature as above to determine the salmon signature string S.
-  # Retrieve the content of sal:signature, strip any leading or trailing whitespace; call the result S'.
-  # If S == S' bit for bit, the signature matches and the salmon is valid.  Else, it fails and the salmon is invalid.
+  # Calculate the Signature Base String as in "Creating the signature" above.
+  # Perform RSASSA-PKCS1-V1_5-VERIFY(public_key, signature_base_string, base64decode(strip_whitespace(sal:signature))
+  # If this returns "signature matches", the salmon is valid; else, it's invalid.
+ 
+=== Discovering the Public Key ===
+
+The private key of the author is assumed to be known to the aggregator in the usual case (but see DelegatedSigning).  However, the public key is not in general known to the source, so it must be discovered.  Thus, Salmon requires PKI, so we'll invent one.
+
+Salmon requires author identity via a globally unique URI.  It also requires that this URI be discoverable via XRD / Webfinger, and that to participate in Salmon, each author identity must publish a public key linked to their URI.  (Note that a Webfinger URI may be an email like identifier.)  Thus, to find the public key, the source performs discovery on the author:uri, retrieves the current public key for that author, and uses that as the "public_key" in the validation step above.  (See SalmonPublicKeys for more details on the exact steps.)
 
