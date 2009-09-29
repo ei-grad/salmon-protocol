@@ -1,0 +1,33 @@
+#summary Details on Republishing Salmon
+
+= Introduction =
+
+If a source chooses to republish salmon sent upstream to it, there are certain requirements that must be met to follow the Salmon protocol.  Note that sources are not required to republish salmon.
+
+= Publishing Comments =
+
+If a source publishes comments for entries in a feed, it should use the standard link@rel="comments" link from each entry to reference the comment feed for that entry.  Aggregators may then subscribe to the comment feed using standard subscription mechanisms, such as polling and PubSubHubbub.
+
+A source which wishes to re-publish salmon comments should simply publish them alongside its native comments in the comments feed for that entry.  If it does this, the source MUST follow the republishing rules described below.  In the text below, "the comments feed" for a salmon refers to the feed of comments referenced by the link@rel="comments" feed associated with the thr:in-reply-to parent of a salmon.
+
+= Republishing Salmon =
+
+When a source accepts a salmon, it SHOULD check the salmon signature (sal:signature) against the rest of the salmon for consistency.  The source MAY do this before accepting the original POST, and in this case a failure SHOULD result in a 400 response.  The source MAY also accept a salmon for processing but do a subsequent signature check later; in this case the response SHOULD be a 204 Accepted.
+
+In either case, if the signature check fails, the salmon MUST NOT be published in the link@rel="comments" feed of its thr:in-reply-to parent.  Note that even if the signature check succeeds, the source may apply other filters to the salmon before publishing.
+
+If a source does re-publish a salmon in the comments feed, it MUST maintain and re-publish the following elements exactly as provided by the aggregator:  
+  * Contents of atom:author/uri element (a URI)
+  * Contents of atom:id element (a URI)
+  * Contents of atom:updated element (a timestamp)
+  * The thr:in-reply-to@ref attribute's content (a URI)
+  * The link@rel="self" @href attribute's content (a URI)
+  * Contents of sal:signature element (a base64 encoded text string)
+
+This data must be octet-for-octet identical to the original, with the exception of leading and trailing whitespace (which is stripped during the signature generation process).
+
+This allows readers to perform their own verification of these parts of the content, independent of the source.  The source is free to transform, translate, summarize, or elide other parts of the salmon in republishing, but the result SHOULD be a reasonable alternate representation of the original content.  Note that this can be checked after the fact by the aggregator, or anyone else if the original salmon is published publicly.
+
+Note that aggregators which monitor the comments feed will see a mixture of native and salmon comments in it, including salmon that they pushed upstream.  Aggregators SHOULD de-duplicate salmon by matching atom:ids (and checking signatures).  Note that the signature guards against forgery of the id.
+
+The results of de-duplicating salmon are aggregator-dependent.  Some may simply ignore salmon they already know about; others may do sanity checking/verification that salmon have not been tampered with; others may perform more complex visualization.  However, aggregators are guaranteed to have an unforgeable, globally unique ID to use for all these purposes.
