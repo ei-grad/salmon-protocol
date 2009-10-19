@@ -1,8 +1,8 @@
-#summary The PKI proposal for Salmon
+#summary A PKI proposal for Salmon
 
 = Introduction =
 
-Salmon needs a Public Key Infrastructure, so this invents a lightweight one based on XRD and Webfinger.
+PROPOSAL:  For full generality, Salmon needs a Public Key Infrastructure, so this invents a lightweight one based on XRD and Webfinger.
 
 = Details =
 
