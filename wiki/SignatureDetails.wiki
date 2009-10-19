@@ -1,8 +1,8 @@
-#summary One-sentence summary of this page.
+#summary Proposed signature generation and validation mechanism.
 
 = Introduction =
 
-Salmon introduces a sal:signature element to be used for verifying the provenance of salmon comments.  This page provides details on the signature, its algorithm, and the motivations behind both.
+PROPOSAL: Salmon introduces a sal:signature element to be used for verifying the provenance of salmon comments.  This page provides details on the signature, its algorithm, and the motivations behind both.
 
 The major issues around signing revolve around what is to be signed, and how to canonicalize the data to be signed in a portable and interoperable way.  Past experience has shown that canonicalization is a major stumbling block when writing code, especially code that relies on layers of libraries that may do nearly but not quite the right thing in all cases.  Unlike most cases on the Web, a single bit error results in a total failure, with little feedback allowed due to security concerns.  This also encourages the use of custom code to create signature base strings, which hurts interoperability and security (as every new line of code is a potential source of both interop and security bugs).
 
@@ -46,4 +46,3 @@ Validation:
 The private key of the author is assumed to be known to the aggregator in the usual case (but see DelegatedSigning).  However, the public key is not in general known to the source, so it must be discovered.  Thus, Salmon requires PKI, so we'll invent one.
 
 Salmon requires author identity via a globally unique URI.  It also requires that this URI be discoverable via XRD / Webfinger, and that to participate in Salmon, each author identity must publish a public key linked to their URI.  (Note that a Webfinger URI may be an email like identifier.)  Thus, to find the public key, the source performs discovery on the author:uri, retrieves the current public key for that author, and uses that as the "public_key" in the validation step above.  (See SalmonPublicKeys for more details on the exact steps.)
-
