@@ -1,0 +1,13 @@
+#summary More use cases that Salmon could address.
+
+= Introduction =
+
+Please add more Salmon use cases that can be considered as part of the specification envelope and/or future extensions here.
+
+= Details =
+
+* SelfSalmon
+* Unsolicited @replies and follows of people -- real time notifications and data updates for cross-site follower lists as well.
+* Published, signed "offers to sell" and "offers to buy" and "offers to hire".
+* License grant request for syndicated content (contact endpoint for structured "I want to re-use this content beyond fair use" requests)
+* Request for quotes (mortgage rates, auto insurance, ...) without revealing contact information.
