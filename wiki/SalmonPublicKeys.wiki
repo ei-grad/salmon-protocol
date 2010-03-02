@@ -1,3 +1,5 @@
+NOTE: Most of this has been obsoleted by Magic Signatures.  Some of the key rotation mechanisms detailed here are not yet in the MS spec so I'm leaving this page as a historical document/source of input to the specification for now.
+
 #summary A PKI proposal for Salmon
 
 = Introduction =
