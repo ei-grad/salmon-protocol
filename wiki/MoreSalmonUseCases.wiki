@@ -14,3 +14,4 @@ Please add more Salmon use cases that can be considered as part of the specifica
   * Reputation generation via published activities -- an analysis of salmon.
   * Ratings via Salmon with provenance.
   * Non-hierarchical web of trust mechanism for public key verification -- if you are connected to A, A can send a signed salmon vouching for B's public key, obviating the need for a hierarchical certificate authority.
+  * Distributed spam notifications with reporter provenance -- "X says Y is spam", potentially with details in the structured message (urls that are spammy, confidence levels, etc.)
